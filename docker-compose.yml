@@ -1,0 +1,34 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    restart: always
+    container_name: effective_mobile-db-1
+    environment:
+      POSTGRES_USER: appuser
+      POSTGRES_PASSWORD: 123
+      POSTGRES_DB: effective_mobile
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U appuser -d effective_mobile"]
+      interval: 2s
+      timeout: 3s
+      retries: 10
+    volumes:
+      - effective_mobile_postgres_data:/var/lib/postgresql/data
+
+  app:
+    build: .
+    container_name: effective_mobile-app-1
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgres://appuser:123@db:5432/effective_mobile?sslmode=disable
+    ports:
+      - "8080:8080"
+
+volumes:
+  effective_mobile_postgres_data:
