@@ -12,15 +12,12 @@ import (
 	"github.com/golang-migrate/migrate/v4/source/iofs"
 )
 
-// Migrator структура для применения миграций.
 type Migrator struct {
-	srcDriver source.Driver // Драйвер источника миграций.
+	srcDriver source.Driver
 }
 
-// MustGetNewMigrator создает новый экземпляр Migrator с встроенными SQL-файлами миграций.
-// В случае ошибки вызывает panic.
 func MustGetNewMigrator(sqlFiles embed.FS, dirName string) *Migrator {
-	// Создаем новый драйвер источника миграций с встроенными SQL-файлами.
+
 	d, err := iofs.New(sqlFiles, dirName)
 	if err != nil {
 		panic(err)
@@ -30,7 +27,6 @@ func MustGetNewMigrator(sqlFiles embed.FS, dirName string) *Migrator {
 	}
 }
 
-// ApplyMigrations применяет миграции к базе данных.
 func (m *Migrator) ApplyMigrations(dbURL string) error {
 	db, err := sql.Open("postgres", dbURL)
 	if err != nil {
